@@ -29,7 +29,6 @@ def python(text='is cool'):
     return f'Python {escape(new_text)}'
 
 
-@app.route('/number', strict_slashes=False)
 @app.route('/number/<int:n>', strict_slashes=False)
 def number(n):
     return f'{escape(n)} is a number'
