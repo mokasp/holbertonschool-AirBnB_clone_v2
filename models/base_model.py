@@ -9,8 +9,7 @@ from datetime import datetime
 from sqlalchemy import (
     Column,
     String,
-    DateTime,
-    Uuid
+    DateTime
 )
 
 
