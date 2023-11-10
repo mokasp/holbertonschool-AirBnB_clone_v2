@@ -12,6 +12,7 @@ from models.city import City
 from models.amenity import Amenity
 from models.review import Review
 import os
+import re
 import shlex
 
 
@@ -103,7 +104,7 @@ class HBNBCommand(cmd.Cmd):
     def do_quit(self, command):
         """ Method to exit the HBNB console"""
         if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-            storage.close()
+            storage.shutdown()
         exit()
 
     def help_quit(self):
@@ -113,7 +114,7 @@ class HBNBCommand(cmd.Cmd):
     def do_EOF(self, arg):
         """ Handles EOF to exit program """
         if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-            storage.close()
+            storage.shutdown()
         print()
         exit()
 
@@ -231,9 +232,11 @@ class HBNBCommand(cmd.Cmd):
 
         if len(args) == 0:
             for key in dictionary:
-                instance_list.append(str(dictionary[key]))
+                instance_list.append(dictionary[key])
             if len(instance_list) != 0:
-                print(instance_list)
+                for item in instance_list:
+                    print(item)
+                return
         elif line[0] not in self.classes:
             print("** class doesn\'t exist **")
             return
@@ -241,8 +244,9 @@ class HBNBCommand(cmd.Cmd):
             for key in dictionary:
                 var = key.split(".")
                 if var[0] == line[0]:
-                    instance_list.append(str(dictionary[key]))
-                print(instance_list)
+                    instance_list.append(dictionary[key])
+                for item in instance_list:
+                    print(item)
 
     def help_all(self):
         """ Help information for the all command """
@@ -252,7 +256,7 @@ class HBNBCommand(cmd.Cmd):
     def do_count(self, args):
         """Count current number of class instances"""
         count = 0
-        for k, v in storage._FileStorage__objects.items():
+        for k, v in storage.all().items():
             if args == k.split('.')[0]:
                 count += 1
         print(count)
@@ -261,91 +265,49 @@ class HBNBCommand(cmd.Cmd):
         """ """
         print("Usage: count <class_name>")
 
-    def do_update(self, args):
-        """ Updates a certain object with new info """
-        c_name = c_id = att_name = att_val = kwargs = ''
-
-        # isolate cls from id/args, ex: (<cls>, delim, <id/args>)
-        args = args.partition(" ")
-        if args[0]:
-            c_name = args[0]
-        else:  # class name not present
+    def do_update(self, line):
+        """
+        Enter the command:
+        update <class> <id> <new attribute> "<new attribute value>"
+        to add a new attribute to an instance of the specific class.
+        """
+        args = line.split()
+        dictionary = storage.all()
+        if len(line) == 0:
             print("** class name missing **")
             return
-        if c_name not in HBNBCommand.classes:  # class name invalid
+        elif args[0] not in self.classes.keys():
             print("** class doesn't exist **")
             return
-
-        # isolate id from args
-        args = args[2].partition(" ")
-        if args[0]:
-            c_id = args[0]
-        else:  # id not present
+        elif len(args) == 1:
             print("** instance id missing **")
             return
-
-        # generate key from class and id
-        key = c_name + "." + c_id
-
-        # determine if key is present
-        if key not in storage.all():
+        key = f"{args[0]}.{args[1]}"
+        if key not in dictionary:
             print("** no instance found **")
             return
-
-        # first determine if kwargs or args
-        if '{' in args[2] and '}' in args[2] and type(eval(args[2])) is dict:
-            kwargs = eval(args[2])
-            args = []  # reformat kwargs into list, ex: [<name>, <value>, ...]
-            for k, v in kwargs.items():
-                args.append(k)
-                args.append(v)
-        else:  # isolate args
-            args = args[2]
-            # Fixed SyntaxWarning 10/26/23
-            if args and args[0] == '\"':  # check for quoted arg
-                second_quote = args.find('\"', 1)
-                att_name = args[1:second_quote]
-                args = args[second_quote + 1:]
-
-            args = args.partition(' ')
-
-            # if att_name was not quoted arg
-            # Fixed SyntaxWarning 10/26/23
-            if not att_name and args[0] != ' ':
-                att_name = args[0]
-            # check for quoted val arg
-            # Fixed SyntaxWarning 10/26/23
-            if args[2] and args[2][0] == '\"':
-                att_val = args[2][1:args[2].find('\"', 1)]
-
-            # if att_val was not quoted arg
-            if not att_val and args[2]:
-                att_val = args[2].partition(' ')[0]
-
-            args = [att_name, att_val]
-
-        # retrieve dictionary of current objects
-        new_dict = storage.all()[key]
-
-        # iterate through attr names and values
-        for i, att_name in enumerate(args):
-            # block only runs on even iterations
-            if (i % 2 == 0):
-                att_val = args[i + 1]  # following item is value
-                if not att_name:  # check for att_name
-                    print("** attribute name missing **")
-                    return
-                if not att_val:  # check for att_value
-                    print("** value missing **")
-                    return
-                # type cast as necessary
-                if att_name in HBNBCommand.types:
-                    att_val = HBNBCommand.types[att_name](att_val)
-
-                # update dictionary with name, value pair
-                new_dict.__dict__.update({att_name: att_val})
-
-        new_dict.save()  # save updates to file
+        if len(args) == 2:
+            print("** attribute name missing **")
+            return
+        elif len(args) == 3:
+            print("** value missing **")
+            return
+        the_object = dictionary.get(key)
+        object_to_dict = the_object.to_dict()
+        class_name = object_to_dict.get('__class__')
+        object_dict = self.classes[class_name].__dict__
+        strings = re.findall('"([^"]*)"', line)
+        attribute_key = args[2]
+        attribute_value = strings[0]
+        if attribute_key in object_dict:
+            if isinstance(object_dict.get(attribute_key), str):
+                attribute_value = str(attribute_value)
+            elif isinstance(object_dict.get(attribute_key), int):
+                attribute_value = int(float(attribute_value))
+            elif isinstance(object_dict.get(attribute_key), float):
+                attribute_value = float(attribute_value)
+        setattr(the_object, attribute_key, attribute_value)
+        storage.save()
 
     def help_update(self):
         """ Help information for the update class """
