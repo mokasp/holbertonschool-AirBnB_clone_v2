@@ -20,8 +20,10 @@ class State(BaseModel, Base):
 
     @property
     def cities(self):
-        new_list = []
+        new_dict = {}
         a = storage.all()
-        for objects in a:
-            x = type(a[objects])
-        return x
+        for key in a:
+            b = a[key].to_dict()
+            if b['__class__'] == 'City' and b['state_id'] == self.id:
+                new_dict.update({key: a[key]})
+        return new_dict
