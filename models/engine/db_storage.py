@@ -45,7 +45,6 @@ class DBStorage:
                     dictionary[key] = value
         else:
             user_obj = self.__session.query(cls).all()
-            print(user_obj)
             for value in user_obj:
                 key = value.__class__.__name__ + '.' + value.id
                 dictionary[key] = value
@@ -82,3 +81,6 @@ class DBStorage:
                                        expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
+    
+    def shutdown(self):
+        self.__session.close()
