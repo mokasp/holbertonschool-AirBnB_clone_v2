@@ -6,7 +6,7 @@ from models import storage
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     Column,
-    String,
+    String
 )
 
 
