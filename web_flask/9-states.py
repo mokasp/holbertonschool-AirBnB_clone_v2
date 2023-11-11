@@ -2,8 +2,7 @@
 """ module containing 7 simple web applications with flask """
 from flask import Flask, render_template, g
 from models import storage
-from markupsafe import escape
-from os import environ
+
 
 app = Flask(__name__)
 app.debug = False
