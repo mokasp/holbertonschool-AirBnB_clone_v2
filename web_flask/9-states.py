@@ -30,10 +30,7 @@ def states(id=None):
 
 @app.teardown_appcontext
 def teardown_db(e=None):
-    db = g.pop('db', None)
-
-    if db is not None:
-        db.close()
+    storage.close()
 
 
 if __name__ == '__main__':
