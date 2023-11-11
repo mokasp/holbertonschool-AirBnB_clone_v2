@@ -26,7 +26,7 @@ def state(id):
         if x[item].id == id:
             state = x[item]
             return render_template("9-states.html", id=id, state=state)
-    return 'Not found!'
+    return render_template('9-states_not_found.html')
 
 
 @app.teardown_appcontext
