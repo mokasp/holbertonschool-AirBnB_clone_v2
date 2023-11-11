@@ -8,26 +8,22 @@ app = Flask(__name__)
 
 
 @app.route('/states', strict_slashes=False)
-def states():
-    from models.state import State
-    storage.reload()
-    states = []
-    x = storage.all(State)
-    for item in x:
-        states.append(x[item])
-    return render_template("7-states_list.html", states=states)
-
-
 @app.route('/states/<id>', strict_slashes=False)
-def state(id):
+def state(id=None):
     from models.state import State
     storage.reload()
     x = storage.all(State)
-    for item in x:
-        if x[item].id == id:
-            state = x[item]
-            return render_template("9-states.html", id=id, state=state)
-    return render_template('9-states_not_found.html')
+    if id is None:
+        states = []
+        for item in x:
+            states.append(x[item])
+        return render_template("7-states_list.html", states=states)
+    elif id is not None:
+        for item in x:
+            if x[item].id == id:
+                state = x[item]
+                return render_template("9-states.html", id=id, state=state)
+        return render_template('9-states_not_found.html')
 
 
 @app.teardown_appcontext
