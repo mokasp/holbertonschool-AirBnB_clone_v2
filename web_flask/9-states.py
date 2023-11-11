@@ -7,9 +7,6 @@ from markupsafe import escape
 app = Flask(__name__)
 
 
-app.config['DEBUG'] = False
-
-
 @app.route('/states', strict_slashes=False)
 @app.route('/states/<id>', strict_slashes=False)
 def states(id=None):
@@ -38,5 +35,5 @@ def teardown_db(e=None):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=False)
     teardown_db()
