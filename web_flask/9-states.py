@@ -6,6 +6,7 @@ from markupsafe import escape
 
 app = Flask(__name__)
 
+
 @app.route('/states', strict_slashes=False)
 def states():
     from models.state import State
