@@ -5,7 +5,7 @@ from models import storage
 from markupsafe import escape
 
 app = Flask(__name__)
-app.config['FLASK_DEBUG'] = False
+app.debug = False
 
 
 @app.route('/states', strict_slashes=False)
