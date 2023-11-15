@@ -48,9 +48,11 @@
 
 
 .container .filters .locations h3 {
-    margin: 0;
     font-weight: 600;
     padding-top: 1rem;
+    margin-top: -0.55rem;
+    font-size: 20px;
+    margin-left: -1rem;
 }
 
 .container .filters .locations h4 {
@@ -60,11 +62,12 @@
 }
 
 .container .filters .amenities h3 {
-    margin: 0;
     font-weight: 600;
     padding-top: 1rem;
+    margin-top: -0.55rem;
+    font-size: 20px;
+    margin-left: -1rem;
 }
-
 .container .filters .amenities h4 {
     margin: 0;
     font-size: 14px;
@@ -87,16 +90,24 @@
     list-style: none;
 	overflow: scroll;
 	max-height: 300px;
+    margin-top: 2.4rem;
+    padding-right: 3rem;
+    padding-left: 0;
 }
 
 .container .filters .locations .popover li {
     list-style: none;
     font-size: 70%;
     font-weight: 300;
+    text-align: left;
 }
 
 .container .filters .locations .popover h2 {
-    font-size: 16px;
+    font-size: 22px;
+    font-weight: 550;
+    text-align: left;
+    margin-bottom: 0.6rem;
+    margin-left: 1.25rem;
 }
 
 .container .filters .amenities:hover .popover {
@@ -105,10 +116,9 @@
     position: relative;
     width: 100%;
     right: 3rem;
-    padding: 1rem;
     border: solid #DDDDDD 1px;
     border-radius: 4px;
-    padding-left: 3rem;
+	overflow: scroll;
 }
 
 .container .filters .amenities .popover {
@@ -116,6 +126,9 @@
     list-style: none;
 	overflow: scroll;
 	max-height: 300px;
+    margin-top: 2.4rem;
+    padding-right: 0.55rem;
+    padding-top: 1rem;
 }
 
 .container .filters .amenities .popover li {
